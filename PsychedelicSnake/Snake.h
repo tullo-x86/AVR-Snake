@@ -21,11 +21,14 @@ struct Point
 
 // Consider direction as pointing from the tail to the head.
 // In other words, the direction the player is facing.
-#define DIR_MASK	(0x03 << 6)
-#define DIR_RIGHT	(0x00 << 6)
-#define DIR_UP		(0x01 << 6)
-#define DIR_LEFT	(0x02 << 6)
-#define DIR_DOWN	(0x03 << 6)
+#define DIR_VERTICAL_MASK	(0x01 << 6)
+#define DIR_DOWNLEFT_MASK	(0x02 << 6)
+#define DIR_MASK			(0x03 << 6)
+#define DIR_RIGHT			(0x00 << 6)
+#define DIR_UP				(0x01 << 6)
+#define DIR_LEFT			(0x02 << 6)
+#define DIR_DOWN			(0x03 << 6)
+#define LENGTH_MASK			(~DIR_MASK)
 
 typedef uint8_t Direction;
 

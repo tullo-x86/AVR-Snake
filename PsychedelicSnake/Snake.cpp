@@ -96,14 +96,27 @@ Direction Player::GetDirection() {
 
 bool Player::CollidedBy(const Point& coord) {
 
-	Point* lastCoord = &head;
+	Point lastSegmentEnd = head;
 
 	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++)
 	{
-		// Work out the direction to backtrack
+		// The direction the snake is facing
 		Direction dir = segments[i] & DIR_MASK;
+		uint8_t length = segments[i] & LENGTH_MASK;
 
-		// 
+		// Does this segment travel vertically?
+		if (dir & DIR_VERTICAL_MASK != 0)
+		{
+			// Vertical travel means X coordinate must match.
+			if (coord.x != lastSegmentEnd.x)
+				continue;
+
+			uint8_t yFinal = (dir & DIR_DOWNLEFT_MASK == 0)		// If == 0, snake is going up
+								? lastSegmentEnd.y + length	// Backtrack down
+								: lastSegmentEnd.y - length;	// Backtrack up
+			
+			
+		}
 	}
 
 	return false;
