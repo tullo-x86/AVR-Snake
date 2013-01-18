@@ -56,24 +56,23 @@ void SnakeGame::Render() {
 	_render(this);
 }
 
-
-
 Player::Player(Point spawnPoint, Direction dir)
-	: head(spawnPoint)
+	: _head(spawnPoint)
 {
-	segments[0] = dir | PLAYER_INITIAL_LENGTH;
-	segments[1] = 0; // Zero byte signifies end of snake
+	_segments[0] = dir | PLAYER_INITIAL_LENGTH;
+	_segments[1] = 0; // Zero byte signifies end of snake
+	// Don't care about the rest of it, quite honestly.
 }
 
 Player::Player(void)
-	: head(0, 0)
+	: _head(0, 0)
 { }
 
 Player::~Player(void)
 { }
 
 Point Player::GetNextCoord() {
-	Point nextCoord = head;
+	Point nextCoord = _head;
 	switch (GetDirection())
 	{
 	case DIR_RIGHT:
@@ -94,17 +93,17 @@ Point Player::GetNextCoord() {
 }
 
 Direction Player::GetDirection() {
-	return segments[0] & DIR_MASK;
+	return _segments[0] & DIR_MASK;
 }
 
 bool Player::CollidedBy(const Point& coord) {
 	// The previous (headward) segment ended at this coordinate.
-	Point lastSegmentEnd = head;
+	Point lastSegmentEnd = _head;
 
 	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++) {
 		// The direction the snake is facing
-		Direction dir = segments[i] & DIR_MASK;
-		uint8_t length = segments[i] & LENGTH_MASK;
+		Direction dir = _segments[i] & DIR_MASK;
+		uint8_t length = _segments[i] & LENGTH_MASK;
 
 		// If we hit a zero-length segment, we have reached the snake's tail.
 		if (length == 0) return false;

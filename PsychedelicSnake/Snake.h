@@ -64,8 +64,8 @@ public:
 	bool CollidedBy(const Point& coord);
 
 private:
-	Point head;
-	SnakeSegment segments[PLAYER_MAX_SEGMENTS];
+	Point _head;
+	SnakeSegment _segments[PLAYER_MAX_SEGMENTS];
 };
 
 class SnakeGame
