@@ -39,17 +39,16 @@ void SnakeGame::Logic()
 		_victoryState = VICTORY_P2_WIN; // Game over
 
 		// TODO: Handle P2
-		// TODO: Handle tie
+		// TODO: Handle tie (both snakes collided, or both moving into same coordinate
 	}
 
 	// Check for Player 1 bonus
 	//	IF
 	//		coordinate is an apple
 	//	THEN
-	//		Add length to Player 1
+	//		tell Player 1 to grow
 
 	// Move Player 1 forward
-
 }
 
 void SnakeGame::Render() {
@@ -109,10 +108,10 @@ bool Player::CollidedBy(const Point& coord) {
 		if (length == 0) return false;
 
 		// Does this segment travel vertically?
-		if (dir & DIR_VERTICAL_MASK != 0) {
+		if ((dir & DIR_VERTICAL_MASK) != 0) {
 			// Vertical travel means X coordinate must match.
 			if (coord.x == lastSegmentEnd.x) {
-				if (dir & DIR_DOWNRIGHT_MASK == 0) {
+				if ((dir & DIR_DOWNRIGHT_MASK) == 0) {
 					// Snake is going up, so the lastSegmentEnd has the lowest Y-value and the highest is (lastSegmentEnd.y + length)
 					if (lastSegmentEnd.y <= coord.y && coord.y <= lastSegmentEnd.y + length)
 						return true;
@@ -128,7 +127,7 @@ bool Player::CollidedBy(const Point& coord) {
 		} else {
 			// Horizontal travel means Y coordinate must match.
 			if (coord.y == lastSegmentEnd.y) {
-				if (dir & DIR_DOWNRIGHT_MASK == 0) {
+				if ((dir & DIR_DOWNRIGHT_MASK) == 0) {
 					// Snake is going left, so the lastSegmentEnd has the lowest X-value and the highest is (lastSegmentEnd.x + length)
 					if (lastSegmentEnd.x <= coord.x && coord.x <= lastSegmentEnd.x + length)
 						return true;
