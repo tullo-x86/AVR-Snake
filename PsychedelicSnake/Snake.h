@@ -29,7 +29,22 @@ struct Point
 
 typedef uint8_t Direction;
 
+#define WORLD_WIDTH 30
+#define WORLD_HEIGHT 30
+// Right boundary
+#define WORLD_RBOUND (WORLD_WIDTH - 1)
+// Bottom boundary
+#define WORLD_BBOUND (WORLD_HEIGHT - 1)
+
+// Zig-zag across a 30x30 grid. If a player does this then they are being an idiot and will lose segments.
+#define PLAYER_MAX_SEGMENTS (WORLD_WIDTH + WORLD_HEIGHT)
+
 #define PLAYER_INITIAL_LENGTH 3
+
+#define VICTORY_FALSE	0
+#define VICTORY_P1_WIN	1
+#define VICTORY_P2_WIN	2
+#define VICTORY_TIE		3
 
 typedef uint8_t SnakeSegment;
 
@@ -42,9 +57,11 @@ public:
 
 	Point GetNextCoord();
 	Direction GetDirection();
+	bool CollidedBy(const Point& coord);
 
+private:
 	Point head;
-	SnakeSegment segments[60]; // Zig-zag across a 30x30 grid. If a player does this then they are being an idiot and will lose segments.
+	SnakeSegment segments[PLAYER_MAX_SEGMENTS];
 };
 
 class Snake
@@ -66,5 +83,7 @@ private:
 	Player _playerOne;
 
 	void Tick();
+
+	uint8_t _victoryState;
 };
 

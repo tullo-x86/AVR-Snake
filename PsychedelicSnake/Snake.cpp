@@ -27,16 +27,23 @@ void Snake::Run()
 void Snake::Tick()
 {	
 	// Apply Player 1's controls
-	
+
 	// Check for Player 1 collision
 	//	Determine the coordinate Player 1's head will move into
 	Point nextCoord = _playerOne.GetNextCoord();
-	//	IF 
-	//		coordinate is a boundary
-	//	 OR coordinate intersects Player 1's body
-	//	THEN
-	//		Game over
-	//	END IF
+	//	IF coordinate is a boundary
+	if (nextCoord.x == WORLD_RBOUND
+		|| nextCoord.x == 0
+		|| nextCoord.y == WORLD_BBOUND
+		|| nextCoord.y == 0
+		//	 OR coordinate intersects Player 1's body
+		|| _playerOne.CollidedBy(nextCoord))
+	{
+		_victoryState = VICTORY_P2_WIN; // Game over
+
+		// TODO: Handle P2
+		// TODO: Handle tie
+	}
 
 	// Check for Player 1 bonus
 	//	IF
@@ -79,8 +86,25 @@ Point Player::GetNextCoord() {
 		nextCoord.y++;
 		break;
 	}
+
+	return nextCoord;
 }
 
 Direction Player::GetDirection() {
 	return segments[0] & DIR_MASK;
+}
+
+bool Player::CollidedBy(const Point& coord) {
+
+	Point* lastCoord = &head;
+
+	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++)
+	{
+		// Work out the direction to backtrack
+		Direction dir = segments[i] & DIR_MASK;
+
+		// 
+	}
+
+	return false;
 }
