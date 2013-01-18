@@ -1,10 +1,8 @@
 #include "Snake.h"
 #include <Windows.h>
 
-SnakeGame::SnakeGame(uint8_t width, uint8_t height, void (*render)(uint8_t*))
+SnakeGame::SnakeGame(void (*render)(SnakeGame*))
 {
-	_width = width;
-	_height = height;
 	_render = render;
 	_playerOne = Player(Point(PLAYER_INITIAL_LENGTH+1, PLAYER_INITIAL_LENGTH+1), DIR_RIGHT);
 }
@@ -55,9 +53,10 @@ void SnakeGame::Logic()
 }
 
 void SnakeGame::Render() {
-	uint8_t world[32];
-	_render(world);
+	_render(this);
 }
+
+
 
 Player::Player(Point spawnPoint, Direction dir)
 	: head(spawnPoint)

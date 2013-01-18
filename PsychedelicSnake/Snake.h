@@ -74,15 +74,12 @@ public:
 	// Width and height represent the game world. Render accepts world data
 	// in left-to-right, top-to-bottom order. World data excludes world
 	// boundaries.
-	SnakeGame(uint8_t width, uint8_t height, void (*render)(uint8_t* worldData));
+	SnakeGame(void (*render)(SnakeGame* worldData));
 	~SnakeGame(void);
 
 	void Run();
 private:
-	uint8_t _width;
-	uint8_t _height;
-	uint8_t _maxPlayerLength;
-	void (*_render)(uint8_t* worldData);
+	void (*_render)(SnakeGame* worldData);
 
 	Player _playerOne;
 
