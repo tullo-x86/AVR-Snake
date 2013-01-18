@@ -1,7 +1,7 @@
 #include "Snake.h"
 #include <Windows.h>
 
-Snake::Snake(uint8_t width, uint8_t height, void (*render)(uint8_t*))
+SnakeGame::SnakeGame(uint8_t width, uint8_t height, void (*render)(uint8_t*))
 {
 	_width = width;
 	_height = height;
@@ -9,22 +9,21 @@ Snake::Snake(uint8_t width, uint8_t height, void (*render)(uint8_t*))
 	_playerOne = Player(Point(PLAYER_INITIAL_LENGTH+1, PLAYER_INITIAL_LENGTH+1), DIR_RIGHT);
 }
 
-Snake::~Snake(void)
+SnakeGame::~SnakeGame(void)
 {
 }
 
-void Snake::Run()
+void SnakeGame::Run()
 {
-	uint8_t world[32];
 	while(true)
 	{
-		Tick();
-		_render(world);
-		Sleep(100); // TODO convert to AVR
+		Logic();
+		Render();
+		Sleep(100); // TODO Windows-only
 	}
 }
 
-void Snake::Tick()
+void SnakeGame::Logic()
 {	
 	// Apply Player 1's controls
 
@@ -53,6 +52,11 @@ void Snake::Tick()
 
 	// Move Player 1 forward
 
+}
+
+void SnakeGame::Render() {
+	uint8_t world[32];
+	_render(world);
 }
 
 Player::Player(Point spawnPoint, Direction dir)
@@ -111,7 +115,7 @@ bool Player::CollidedBy(const Point& coord) {
 			// Vertical travel means X coordinate must match.
 			if (coord.x == lastSegmentEnd.x) {
 				if (dir & DIR_DOWNRIGHT_MASK == 0) {
-					// Snake is going up, so the lastSegmentEnd has the lowest Y-value and the highest is (lSE.y + length)
+					// Snake is going up, so the lastSegmentEnd has the lowest Y-value and the highest is (lastSegmentEnd.y + length)
 					if (lastSegmentEnd.y <= coord.y && coord.y <= lastSegmentEnd.y + length)
 						return true;
 
@@ -127,7 +131,7 @@ bool Player::CollidedBy(const Point& coord) {
 			// Horizontal travel means Y coordinate must match.
 			if (coord.y == lastSegmentEnd.y) {
 				if (dir & DIR_DOWNRIGHT_MASK == 0) {
-					// Snake is going left, so the lastSegmentEnd has the lowest X-value and the highest is (lSE.x + length)
+					// Snake is going left, so the lastSegmentEnd has the lowest X-value and the highest is (lastSegmentEnd.x + length)
 					if (lastSegmentEnd.x <= coord.x && coord.x <= lastSegmentEnd.x + length)
 						return true;
 

@@ -68,14 +68,14 @@ private:
 	SnakeSegment segments[PLAYER_MAX_SEGMENTS];
 };
 
-class Snake
+class SnakeGame
 {
 public:
 	// Width and height represent the game world. Render accepts world data
 	// in left-to-right, top-to-bottom order. World data excludes world
 	// boundaries.
-	Snake(uint8_t width, uint8_t height, void (*render)(uint8_t* worldData));
-	~Snake(void);
+	SnakeGame(uint8_t width, uint8_t height, void (*render)(uint8_t* worldData));
+	~SnakeGame(void);
 
 	void Run();
 private:
@@ -86,7 +86,8 @@ private:
 
 	Player _playerOne;
 
-	void Tick();
+	void Logic();
+	void Render();
 
 	uint8_t _victoryState;
 };
