@@ -95,29 +95,53 @@ Direction Player::GetDirection() {
 }
 
 bool Player::CollidedBy(const Point& coord) {
-
+	// The previous (headward) segment ended at this coordinate.
 	Point lastSegmentEnd = head;
 
-	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++)
-	{
+	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++) {
 		// The direction the snake is facing
 		Direction dir = segments[i] & DIR_MASK;
 		uint8_t length = segments[i] & LENGTH_MASK;
 
-		// Does this segment travel vertically?
-		if (dir & DIR_VERTICAL_MASK != 0)
-		{
-			// Vertical travel means X coordinate must match.
-			if (coord.x != lastSegmentEnd.x)
-				continue;
+		// If we hit a zero-length segment, we have reached the snake's tail.
+		if (length == 0) return false;
 
-			uint8_t yFinal = (dir & DIR_DOWNLEFT_MASK == 0)		// If == 0, snake is going up
-								? lastSegmentEnd.y + length	// Backtrack down
-								: lastSegmentEnd.y - length;	// Backtrack up
-			
-			
+		// Does this segment travel vertically?
+		if (dir & DIR_VERTICAL_MASK != 0) {
+			// Vertical travel means X coordinate must match.
+			if (coord.x == lastSegmentEnd.x) {
+				if (dir & DIR_DOWNRIGHT_MASK == 0) {
+					// Snake is going up, so the lastSegmentEnd has the lowest Y-value and the highest is (lSE.y + length)
+					if (lastSegmentEnd.y <= coord.y && coord.y <= lastSegmentEnd.y + length)
+						return true;
+
+					lastSegmentEnd.y += length;
+				} else {
+					if (lastSegmentEnd.y - length <= coord.y && coord.y <= lastSegmentEnd.y)
+						return true;
+
+					lastSegmentEnd.y -= length;
+				}
+			}
+		} else {
+			// Horizontal travel means Y coordinate must match.
+			if (coord.y == lastSegmentEnd.y) {
+				if (dir & DIR_DOWNRIGHT_MASK == 0) {
+					// Snake is going left, so the lastSegmentEnd has the lowest X-value and the highest is (lSE.x + length)
+					if (lastSegmentEnd.x <= coord.x && coord.x <= lastSegmentEnd.x + length)
+						return true;
+
+					lastSegmentEnd.x += length;
+				} else {
+					if (lastSegmentEnd.x - length <= coord.x && coord.x <= lastSegmentEnd.x)
+						return true;
+
+					lastSegmentEnd.x -= length;
+				}
+			}
 		}
 	}
 
+	// We reached the end of the array without a zero-length segment *or* a collision? Ho, boy.
 	return false;
 }
