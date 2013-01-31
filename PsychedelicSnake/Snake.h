@@ -1,13 +1,6 @@
 #pragma once
 #include <stdint.h>
 
-struct Pixel
-{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-};
-
 struct Point
 {
 	Point(uint8_t xPos, uint8_t yPos)
