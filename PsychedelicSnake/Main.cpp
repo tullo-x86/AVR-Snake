@@ -1,10 +1,11 @@
 #include "Snake.h"
 #include "PixelToaster.h"
+#include <Windows.h>
 
 using namespace PixelToaster;
 
-void render(SnakeGame*);
-void setPixel(int, int, uint8_t);
+void setPixel(uint8_t, uint8_t, uint8_t);
+void clearFrameBuffer();
 
 const int ScaleFactor = 20;
 const int ScreenWidth = WORLD_WIDTH * ScaleFactor;
@@ -15,32 +16,36 @@ vector<Pixel> pixels;
 
 void main()
 {
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		palette[i].r = (i % 64) / 63.0f;
-		palette[i].g = (i % 128) / 127.0f;
-		palette[i].b = i / 255.0f;
+		palette[i].r = i / 63.0f;
+		palette[i].g = palette[i].b = 0;
 	}
+
+	for (int i = 0; i < 64; i++)
+	{
+		palette[i+64].g = i / 63.0f;
+		palette[i+64].r = palette[i].b = 0;
+	}
+
+	for (int i = 0; i < 64; i++)
+	{
+		palette[i+128].b = i / 63.0f;
+		palette[i+128].r = palette[i].g = 0;
+	}
+
+	for (int i = 0; i < 64; i++)
+	{
+		palette[i+192].r = palette[i+192].g = palette[i+192].b = i / 63.0f;
+	}
+
 	Display display( "Fullscreen Example", 600, 600, Output::Windowed );
 	pixels = vector<Pixel>( ScreenWidth * ScreenHeight);
-	
-	SnakeGame game = SnakeGame(render);
-    while ( display.open() )
-    {
+
+	SnakeGame game = SnakeGame(setPixel, clearFrameBuffer);
+	while ( display.open() )
+	{
 		/*
-        unsigned int index = 0;
-        for ( int y = 0; y < ScreenHeight; ++y )
-        {
-            for ( int x = 0; x < ScreenWidth; ++x )
-            {
-                pixels[index].r = 0.8f + y * 0.0015f;
-                pixels[index].g = 0.2f + y * 0.00075f;
-                pixels[index].b = 0.1f + y * 0.0005f;
-
-				++index;
-            }
-        }*/
-
 		for (int y = 0; y < WORLD_HEIGHT; y++)
 		{
 			for (int x = 0; x < WORLD_WIDTH; x++)
@@ -48,19 +53,25 @@ void main()
 				setPixel(x, y, (x + y*WORLD_WIDTH) % 256);
 			}
 		}
+		*/
+		Sleep(100);
+		game.Tick();
 
 		display.update( pixels );
-    }
+	}
 }
 
-void render(SnakeGame* game) {
-	// Go screw with PixelToaster's buffer and tell it to render
-	// or whatever it is the kids do these days
-
-
+void clearFrameBuffer() {
+	for (int y = 0; y < WORLD_HEIGHT; y++)
+	{
+		for (int x = 0; x < WORLD_WIDTH; x++)
+		{
+			setPixel(x, y, 0);
+		}
+	}
 }
 
-void setPixel(int worldX, int worldY, uint8_t colour) {
+void setPixel(uint8_t worldX, uint8_t worldY, uint8_t colour) {
 	const int minX = worldX * ScaleFactor;
 	const int minY = worldY * ScaleFactor;
 	const int maxX = (worldX+1) * ScaleFactor - 1;

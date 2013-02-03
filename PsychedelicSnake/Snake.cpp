@@ -1,9 +1,11 @@
 #include "Snake.h"
-#include <Windows.h>
 
-SnakeGame::SnakeGame(void (*render)(SnakeGame*))
+SnakeGame::SnakeGame(
+	DrawPixel drawPixel,
+	ClearFrameBuffer clear)
 {
-	_render = render;
+	_renderCoord = drawPixel;
+	_clearFrameBuffer = clear;
 	_playerOne = Player(Point(PLAYER_INITIAL_LENGTH+1, PLAYER_INITIAL_LENGTH+1), DIR_RIGHT);
 }
 
@@ -11,14 +13,10 @@ SnakeGame::~SnakeGame(void)
 {
 }
 
-void SnakeGame::Run()
+void SnakeGame::Tick()
 {
-	while(true)
-	{
-		Logic();
-		Render();
-		Sleep(100); // TODO Windows-only
-	}
+	Logic();
+	Render();
 }
 
 void SnakeGame::Logic()
@@ -52,15 +50,22 @@ void SnakeGame::Logic()
 }
 
 void SnakeGame::Render() {
-	_render(this);
+	_clearFrameBuffer();
+
+	_playerOne.Draw(_renderCoord);
 }
 
 Player::Player(Point spawnPoint, Direction dir)
 	: _head(spawnPoint)
 {
 	_segments[0] = dir | PLAYER_INITIAL_LENGTH;
-	_segments[1] = 0; // Zero byte signifies end of snake
-	// Don't care about the rest of it, quite honestly.
+	_segments[1] = DIR_UP | 6;
+	_segments[2] = DIR_LEFT | 1;
+	_segments[3] = DIR_UP | 3;
+	_segments[4] = 0; // Zero byte signifies end of snake
+
+	// Don't need to initialise anything else since it'll get
+	// clobbered as the snake moves.
 }
 
 Player::Player(void)
@@ -145,4 +150,44 @@ bool Player::CollidedBy(const Point& coord) {
 
 	// We reached the end of the array without a zero-length segment *or* a collision? Ho, boy.
 	return false;
+}
+
+void NudgeTailwards(Point& point, Direction direction) {
+	if (direction == DIR_RIGHT)	{
+		point.x--;
+	}
+	else if (direction == DIR_LEFT) {
+		point.x++;
+	}
+	else if (direction == DIR_UP) {
+		point.y++;
+	}
+	else {
+		point.y--;
+	}
+
+}
+
+void Player::Draw(DrawPixel draw){
+	
+	// Head pixel is a special colour
+	draw(_head.x, _head.y, COL_P1_HEAD);
+
+	Point coord = _head;
+	
+	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++) {
+		// The direction the snake is facing
+		Direction dir = _segments[i] & DIR_MASK;
+		uint8_t length = _segments[i] & LENGTH_MASK;
+		
+		// If we hit a zero-length segment, we have reached the snake's tail.
+		if (length == 0) return;
+
+		for (int i = 0; i < length; i++)
+		{
+			NudgeTailwards(coord, dir);
+			draw(coord.x, coord.y, COL_P1_BODY);
+		}
+	}
+
 }
