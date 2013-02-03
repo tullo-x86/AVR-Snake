@@ -60,6 +60,7 @@ void SnakeGame::Render() {
 Player::Player(Point spawnPoint, Direction dir)
 	: _head(spawnPoint)
 {
+	_facing = dir;
 	_segments[0] = dir | PLAYER_INITIAL_LENGTH;
 	_segments[1] = DIR_UP | 6;
 	_segments[2] = DIR_LEFT | 1;
@@ -151,7 +152,9 @@ bool Player::CollidedBy(const Point& coord) {
 }
 
 void Player::ApplyControl(Direction dir) {
-	if((dir & DIR_VERTICAL_MASK) != (_facing & DIR_VERTICAL_MASK)) {
+	byte wasVert = _segments[0] & DIR_VERTICAL_MASK;
+	byte isVert = dir & DIR_VERTICAL_MASK;
+	if(wasVert != isVert) {
 		_facing = dir;
 	}
 }
@@ -198,15 +201,6 @@ void Player::Draw(DrawPixel draw){
 }
 
 void Player::MoveForward() {
-	// IN A STRAIGHT LINE:
-	// - Lengthen the first segment
-	// - Shorten the last segment
-
-	// IF CHANGING DIRECTION:
-	// - Shift every segment back one index
-	// - Add a 1-length segment at the head
-	// - Shorten the last segment
-
 	_head = GetNextCoord();
 
 	// Are we changing direction?

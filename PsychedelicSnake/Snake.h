@@ -33,7 +33,8 @@ typedef uint8_t Direction;
 // Bottom boundary
 #define WORLD_BBOUND (WORLD_HEIGHT - 1)
 
-// Zig-zag across a 30x30 grid. If a player does this then they are being an idiot and will lose segments.
+// Long enough to zig-zag across a 30x30 grid.
+// If a player does this then they are being an idiot and will lose segments.
 #define PLAYER_MAX_SEGMENTS (WORLD_WIDTH + WORLD_HEIGHT)
 
 #define PLAYER_INITIAL_LENGTH 3
