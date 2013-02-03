@@ -46,6 +46,7 @@ typedef uint8_t Direction;
 typedef uint8_t SnakeSegment;
 typedef void(*DrawPixel)(uint8_t x, uint8_t y, uint8_t colour);
 typedef void(*ClearFrameBuffer)();
+typedef uint8_t byte;
 
 #define COL_P1_HEAD 63
 #define COL_P1_BODY 32
@@ -58,24 +59,26 @@ public:
 	~Player();
 
 	Point GetNextCoord();
-	Direction GetDirection();
 	bool CollidedBy(const Point& coord);
 
 	void Draw(DrawPixel);
 
+	void ApplyControl(Direction dir);
+	void MoveForward();
+
 private:
 	Point _head;
 	SnakeSegment _segments[PLAYER_MAX_SEGMENTS];
+	Direction _facing;
 };
 
 class SnakeGame
 {
 public:
-	// Width and height represent the game world. Render accepts world data
-	// in left-to-right, top-to-bottom order. World data excludes world
-	// boundaries.
 	SnakeGame(DrawPixel, ClearFrameBuffer);
 	~SnakeGame(void);
+
+	void ApplyPlayer1Control(Direction dir);
 
 	void Tick();
 private:

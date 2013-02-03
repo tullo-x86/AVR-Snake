@@ -20,9 +20,7 @@ void SnakeGame::Tick()
 }
 
 void SnakeGame::Logic()
-{	
-	// Apply Player 1's controls
-
+{
 	// Check for Player 1 collision
 	//	Determine the coordinate Player 1's head will move into
 	Point nextCoord = _playerOne.GetNextCoord();
@@ -46,7 +44,11 @@ void SnakeGame::Logic()
 	//	THEN
 	//		tell Player 1 to grow
 
-	// Move Player 1 forward
+	_playerOne.MoveForward();
+}
+
+void SnakeGame::ApplyPlayer1Control(Direction dir) {
+	_playerOne.ApplyControl(dir);
 }
 
 void SnakeGame::Render() {
@@ -62,7 +64,7 @@ Player::Player(Point spawnPoint, Direction dir)
 	_segments[1] = DIR_UP | 6;
 	_segments[2] = DIR_LEFT | 1;
 	_segments[3] = DIR_UP | 3;
-	_segments[4] = 0; // Zero byte signifies end of snake
+	_segments[4] = 0; // Null terminator
 
 	// Don't need to initialise anything else since it'll get
 	// clobbered as the snake moves.
@@ -77,7 +79,7 @@ Player::~Player(void)
 
 Point Player::GetNextCoord() {
 	Point nextCoord = _head;
-	switch (GetDirection())
+	switch (_facing)
 	{
 	case DIR_RIGHT:
 		nextCoord.x++;
@@ -94,10 +96,6 @@ Point Player::GetNextCoord() {
 	}
 
 	return nextCoord;
-}
-
-Direction Player::GetDirection() {
-	return _segments[0] & DIR_MASK;
 }
 
 bool Player::CollidedBy(const Point& coord) {
@@ -152,6 +150,12 @@ bool Player::CollidedBy(const Point& coord) {
 	return false;
 }
 
+void Player::ApplyControl(Direction dir) {
+	if((dir & DIR_VERTICAL_MASK) != (_facing & DIR_VERTICAL_MASK)) {
+		_facing = dir;
+	}
+}
+
 void NudgeTailwards(Point& point, Direction direction) {
 	if (direction == DIR_RIGHT)	{
 		point.x--;
@@ -169,25 +173,62 @@ void NudgeTailwards(Point& point, Direction direction) {
 }
 
 void Player::Draw(DrawPixel draw){
-	
+
 	// Head pixel is a special colour
 	draw(_head.x, _head.y, COL_P1_HEAD);
 
 	Point coord = _head;
-	
+
+	byte bodyColour = COL_P1_BODY;
 	for (int i = 0; i < PLAYER_MAX_SEGMENTS; i++) {
 		// The direction the snake is facing
 		Direction dir = _segments[i] & DIR_MASK;
 		uint8_t length = _segments[i] & LENGTH_MASK;
-		
+
 		// If we hit a zero-length segment, we have reached the snake's tail.
 		if (length == 0) return;
 
 		for (int i = 0; i < length; i++)
 		{
 			NudgeTailwards(coord, dir);
-			draw(coord.x, coord.y, COL_P1_BODY);
+			draw(coord.x, coord.y, bodyColour);
+			bodyColour -= 2;
 		}
 	}
+}
 
+void Player::MoveForward() {
+	// IN A STRAIGHT LINE:
+	// - Lengthen the first segment
+	// - Shorten the last segment
+
+	// IF CHANGING DIRECTION:
+	// - Shift every segment back one index
+	// - Add a 1-length segment at the head
+	// - Shorten the last segment
+
+	_head = GetNextCoord();
+
+	// Are we changing direction?
+	if ((_segments[0] & DIR_MASK) != _facing)
+	{
+		// If this gets expensive I guess we can use an offset.
+		// Constant time is nice and reliable however.
+		for (int i = PLAYER_MAX_SEGMENTS - 1; i > 0; i--)
+		{
+			_segments[i] = _segments[i-1];
+		}
+		_segments[0] = _facing | 0x01;
+	}
+	else
+	{
+		_segments[0]++;
+	}
+
+	// Find the last segment. Yes, it could be the first one.
+	byte lastSegmentIndex = 0;
+	while (_segments[++lastSegmentIndex] & LENGTH_MASK);
+	lastSegmentIndex--;
+
+	_segments[lastSegmentIndex]--;
 }
