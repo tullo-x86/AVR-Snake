@@ -99,6 +99,10 @@ Point Player::GetNextCoord() {
 	return nextCoord;
 }
 
+bool isAxisPositiveDirection(Direction dir) {
+	return (dir & DIR_DOWNRIGHT_MASK) != 0;
+}
+
 bool Player::CollidedBy(const Point& coord) {
 	// The previous (headward) segment ended at this coordinate.
 	Point lastSegmentEnd = _head;
@@ -114,36 +118,42 @@ bool Player::CollidedBy(const Point& coord) {
 		// Does this segment travel vertically?
 		if ((dir & DIR_VERTICAL_MASK) != 0) {
 			// Vertical travel means X coordinate must match.
-			if (coord.x == lastSegmentEnd.x) {
-				if ((dir & DIR_DOWNRIGHT_MASK) == 0) {
+			bool xCoordinateMatches = coord.x == lastSegmentEnd.x;
+			//if (coord.x == lastSegmentEnd.x) {
+				if (!isAxisPositiveDirection(dir)) {
 					// Snake is going up, so the lastSegmentEnd has the lowest Y-value and the highest is (lastSegmentEnd.y + length)
-					if (lastSegmentEnd.y <= coord.y && coord.y <= lastSegmentEnd.y + length)
+					if (xCoordinateMatches
+						&& lastSegmentEnd.y <= coord.y && coord.y <= lastSegmentEnd.y + length)
 						return true;
 
 					lastSegmentEnd.y += length;
 				} else {
-					if (lastSegmentEnd.y - length <= coord.y && coord.y <= lastSegmentEnd.y)
+					if (xCoordinateMatches
+						&& lastSegmentEnd.y - length <= coord.y && coord.y <= lastSegmentEnd.y)
 						return true;
 
 					lastSegmentEnd.y -= length;
 				}
-			}
+			//}
 		} else {
 			// Horizontal travel means Y coordinate must match.
-			if (coord.y == lastSegmentEnd.y) {
-				if ((dir & DIR_DOWNRIGHT_MASK) == 0) {
+			bool yCoordinateMatches = coord.y == lastSegmentEnd.y;
+			//if (coord.y == lastSegmentEnd.y) {
+				if (!isAxisPositiveDirection(dir)) {
 					// Snake is going left, so the lastSegmentEnd has the lowest X-value and the highest is (lastSegmentEnd.x + length)
-					if (lastSegmentEnd.x <= coord.x && coord.x <= lastSegmentEnd.x + length)
+					if (yCoordinateMatches
+						&& lastSegmentEnd.x <= coord.x && coord.x <= lastSegmentEnd.x + length)
 						return true;
 
 					lastSegmentEnd.x += length;
 				} else {
-					if (lastSegmentEnd.x - length <= coord.x && coord.x <= lastSegmentEnd.x)
+					if (yCoordinateMatches
+						&& lastSegmentEnd.x - length <= coord.x && coord.x <= lastSegmentEnd.x)
 						return true;
 
 					lastSegmentEnd.x -= length;
 				}
-			}
+			//}
 		}
 	}
 
@@ -224,5 +234,6 @@ void Player::MoveForward() {
 	while (_segments[++lastSegmentIndex] & LENGTH_MASK);
 	lastSegmentIndex--;
 
-	_segments[lastSegmentIndex]--;
+	if ((--_segments[lastSegmentIndex] & LENGTH_MASK) == 0)
+		_segments[lastSegmentIndex] = 0;
 }
