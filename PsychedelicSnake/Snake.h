@@ -39,10 +39,16 @@ typedef uint8_t Direction;
 
 #define PLAYER_INITIAL_LENGTH 3
 
-#define VICTORY_FALSE	0
-#define VICTORY_P1_WIN	1
-#define VICTORY_P2_WIN	2
-#define VICTORY_TIE		3
+struct GameState
+{
+	enum Enumeration {
+		Attract,
+		Playing,
+		Player1Win,
+		Player2Win,
+		Tie
+	};
+};
 
 typedef uint8_t SnakeSegment;
 typedef void(*DrawPixel)(uint8_t x, uint8_t y, uint8_t colour);
@@ -86,11 +92,16 @@ private:
 	void (*_renderCoord)(uint8_t x, uint8_t y, uint8_t colour);
 	void (*_clearFrameBuffer)();
 
+	void StartGame();
+
 	void Logic();
+
+	void PlayingLogic();
+
 	void Render();
 
 	Player _playerOne;
 
-	uint8_t _victoryState;
+	GameState::Enumeration _gameState;
 };
 

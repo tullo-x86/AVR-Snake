@@ -7,6 +7,7 @@ SnakeGame::SnakeGame(
 	_renderCoord = drawPixel;
 	_clearFrameBuffer = clear;
 	_playerOne = Player(Point(PLAYER_INITIAL_LENGTH+1, PLAYER_INITIAL_LENGTH+1), DIR_RIGHT);
+	_gameState = GameState::Attract;
 }
 
 SnakeGame::~SnakeGame(void)
@@ -21,6 +22,34 @@ void SnakeGame::Tick()
 
 void SnakeGame::Logic()
 {
+	switch (_gameState)
+	{
+	case GameState::Attract:
+		// Show the attract screen
+		for (byte i = 0; i < 30; i++)
+		{
+			_renderCoord(i, i, i);
+		}
+		break;
+	case GameState::Playing:
+		PlayingLogic();
+		break;
+	case GameState::Player1Win:
+		// Show the victory screen for Player 1
+		break;
+	case GameState::Player2Win:
+		// Show the victory screen for Player 2
+		break;
+	case GameState::Tie:
+		// Show the tie screen
+		break;
+	default:
+		// Something need doing?
+		break;
+	}
+}
+
+void SnakeGame::PlayingLogic() {
 	// Check for Player 1 collision
 	//	Determine the coordinate Player 1's head will move into
 	Point nextCoord = _playerOne.GetNextCoord();
@@ -32,7 +61,7 @@ void SnakeGame::Logic()
 		//	 OR coordinate intersects Player 1's body
 		|| _playerOne.CollidedBy(nextCoord))
 	{
-		_victoryState = VICTORY_P2_WIN; // Game over
+		_gameState = GameState::Player2Win; // Game over
 
 		// TODO: Handle P2
 		// TODO: Handle tie (both snakes collided, or both moving into same coordinate
@@ -48,13 +77,39 @@ void SnakeGame::Logic()
 }
 
 void SnakeGame::ApplyPlayer1Control(Direction dir) {
-	_playerOne.ApplyControl(dir);
+	if (_gameState == GameState::Playing)
+		_playerOne.ApplyControl(dir);
+	else if (dir == DIR_UP)
+		StartGame();
+}
+
+void SnakeGame::StartGame() {
+	_gameState = GameState::Playing;
+	_playerOne = Player(Point(PLAYER_INITIAL_LENGTH+1, PLAYER_INITIAL_LENGTH+1), DIR_RIGHT);
 }
 
 void SnakeGame::Render() {
-	_clearFrameBuffer();
-
-	_playerOne.Draw(_renderCoord);
+	switch (_gameState)
+	{
+	case GameState::Attract:
+		// Show the attract screen
+		break;
+	case GameState::Playing:
+		_playerOne.Draw(_renderCoord);
+		break;
+	case GameState::Player1Win:
+		// Show the victory screen for Player 1
+		break;
+	case GameState::Player2Win:
+		// Show the victory screen for Player 2
+		break;
+	case GameState::Tie:
+		// Show the tie screen
+		break;
+	default:
+		// Something need doing?
+		break;
+	}
 }
 
 Player::Player(Point spawnPoint, Direction dir)
@@ -62,6 +117,7 @@ Player::Player(Point spawnPoint, Direction dir)
 {
 	_facing = dir;
 	_segments[0] = dir | PLAYER_INITIAL_LENGTH;
+	// TODO remove segments 1-3
 	_segments[1] = DIR_UP | 6;
 	_segments[2] = DIR_LEFT | 1;
 	_segments[3] = DIR_UP | 3;

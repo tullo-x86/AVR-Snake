@@ -82,7 +82,12 @@ void main()
 	SnakeGame game = SnakeGame(setPixel, clearFrameBuffer);
 	while ( display.open() )
 	{
-		game.ApplyPlayer1Control(player1Control);
+		if (player1Control != 0xFF)
+		{
+			game.ApplyPlayer1Control(player1Control);
+			player1Control = 0xFF;
+		}
+
 		time = clock();
 		if (time > nextTick)
 		{
