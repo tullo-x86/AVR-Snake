@@ -26,10 +26,6 @@ void SnakeGame::Logic()
 	{
 	case GameState::Attract:
 		// Show the attract screen
-		for (byte i = 0; i < 30; i++)
-		{
-			_renderCoord(i, i, i);
-		}
 		break;
 	case GameState::Playing:
 		PlayingLogic();
@@ -93,18 +89,42 @@ void SnakeGame::Render() {
 	{
 	case GameState::Attract:
 		// Show the attract screen
+		for (byte i = 0; i < 30; i++)
+		{
+			_renderCoord(i, i, i * 2);
+			_renderCoord(i, 29-i, i * 2 + 66);
+			_renderCoord(13, i, i * 2 + 194);
+			_renderCoord(i, 16, i * 2 + 130);
+			_renderCoord(i, 13, i * 2 + 130);
+			_renderCoord(16, i, i * 2 + 194);
+		}
 		break;
 	case GameState::Playing:
 		_playerOne.Draw(_renderCoord);
 		break;
 	case GameState::Player1Win:
 		// Show the victory screen for Player 1
+		for (byte i = 0; i < 30; i++)
+		{
+			_renderCoord(i, i, i * 2);
+			_renderCoord(i, 29-i, i * 2);
+		}
 		break;
 	case GameState::Player2Win:
 		// Show the victory screen for Player 2
+		for (byte i = 0; i < 30; i++)
+		{
+			_renderCoord(i, i, i * 2 + 66);
+			_renderCoord(i, 29-i, i * 2 + 66);
+		}
 		break;
 	case GameState::Tie:
 		// Show the tie screen
+		for (byte i = 0; i < 30; i++)
+		{
+			_renderCoord(i, i, i * 2);
+			_renderCoord(i, 29-i, i * 2 + 66);
+		}
 		break;
 	default:
 		// Something need doing?
